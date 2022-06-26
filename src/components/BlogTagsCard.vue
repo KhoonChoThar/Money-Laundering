@@ -1,16 +1,10 @@
 <template>
   <div class="card">
-    <div class="card-header">Categories</div>
+    <div class="card-header">Tags</div>
     <div class="card-body">
-      <span class="tag">Technology</span>
-      <span class="tag">Information</span>
-      <span class="tag">Uno</span>
-      <span class="tag">Information</span>
-      <span class="tag">Technology</span>
-      <span class="tag">Information</span>
-      <span class="tag">Uno</span>
-      <span class="tag">Technology</span>
-      <span class="tag">Information</span>
+      <span class="tag" v-for="tag in tags" :key="tag.id">{{
+        tag.webTitle
+      }}</span>
     </div>
   </div>
 </template>
@@ -25,26 +19,22 @@ export default {
       tags: [],
     };
   },
-  // methods: {
-  //   handleResponse(res) {
-  //     this.tags = res;
-  //     console.log(this.tags);
-  //   },
-  //   async getTags() {
-  //     // await axios({
-  //     //   method: "get",
-  //     //   url: `http://content.guardianapis.com/tags?api-key=${api}`,
-  //     // })
-
-  //       // .then((res) => this.handleResponse(res))
-  //       // .catch((error) => {
-  //       //   console.log("Error:", error);
-  //       // });
-  //   },
-  //},
+  methods: {
+    handleResponse(res) {
+      this.tags = res.results;
+    },
+    async getTags() {
+      await axios({
+        method: "get",
+        url: `http://content.guardianapis.com/tags?api-key=${api}`,
+      }).then(
+        (res) => this.handleResponse(res.data.response),
+        (err) => console.log(err)
+      );
+    },
+  },
   mounted() {
-    const res =axios.get(`http://content.guardianapis.com/tags?api-key=${api}`)
-    console.log(res.data);
+    this.getTags();
   },
 };
 </script>
@@ -79,6 +69,7 @@ export default {
   margin: 5px 0 5px 5px;
   font-size: 14px;
   display: inline-block;
+  text-align: left;
 }
 
 /* .tag + .tag {

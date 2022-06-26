@@ -1,34 +1,86 @@
 <template>
-<Breadcrumbs></Breadcrumbs>
-<div class="col-8 col-s-12 blogs-container">
-<SingleBlogCard></SingleBlogCard>
-<SingleBlogCard></SingleBlogCard>
-</div>
-<div class="col-4 col-s-12 info-container">
-  <BlogSearch></BlogSearch>
-  <CategoriesCard></CategoriesCard>
-  <BlogRecentPosts></BlogRecentPosts>
-  <BlogTagsCard></BlogTagsCard>
-  <BlogSubscribeCard></BlogSubscribeCard>
-</div>
+  <Breadcrumbs></Breadcrumbs>
+  <div class="col-8 col-s-12 blogs-container">
+    <div v-for="post in posts" :key="post.id">
+      <SingleBlogCard :title="post.webTitle"></SingleBlogCard>
+    </div>
+  </div>
+  <div class="col-4 col-s-12 info-container">
+    <BlogSearch></BlogSearch>
+    <CategoriesCard></CategoriesCard>
+    <BlogRecentPosts></BlogRecentPosts>
+    <BlogTagsCard></BlogTagsCard>
+    <BlogSubscribeCard></BlogSubscribeCard>
+  </div>
 </template>
 
 <script>
-import BlogSubscribeCard from '../components/BlogSubscribeCard'
-import BlogTagsCard from '../components/BlogTagsCard'
-import BlogRecentPosts from '../components/BlogRecentPosts'
-import CategoriesCard from '../components/CategoriesCard'
-import BlogSearch from '../components/BlogSearch'
-import SingleBlogCard from '../components/SingleBlogCard'
-import Breadcrumbs from '../components/Breadcrumbs'
+import SingleBlog from "../components/SingleBlog";
+import BlogSubscribeCard from "../components/BlogSubscribeCard";
+import BlogTagsCard from "../components/BlogTagsCard";
+import BlogRecentPosts from "../components/BlogRecentPosts";
+import CategoriesCard from "../components/CategoriesCard";
+import BlogSearch from "../components/BlogSearch";
+import SingleBlogCard from "../components/SingleBlogCard";
+import Breadcrumbs from "../components/Breadcrumbs";
+
+import axios from "axios";
+const api = "6a2e4bef-aae5-46bc-9d72-caaf901f08da";
 export default {
   components: {
+    SingleBlog,
     BlogSubscribeCard,
     BlogTagsCard,
     BlogRecentPosts,
     CategoriesCard,
     BlogSearch,
-    SingleBlogCard, Breadcrumbs },};
+    SingleBlogCard,
+    Breadcrumbs,
+  },
+  data() {
+    return {
+      posts: [],
+      postContent: null,
+    };
+  },
+  methods: {
+    handleResponse(res) {
+      this.posts = res.results;
+      console.log(this.formatPost(this.posts[0]));
+    },
+    async formatPost(postData) {
+      var postDataFromApi = await this.getSinglePost(postData.apiUrl);
+      var post = {};
+      post.id = postData.id;
+      post.title = postData.webTitle;
+      post.body = postDataFromApi.body;
+      console.log(postDataFromApi);
+      return post;
+    },
+    async getSinglePost(apiUrl) {
+      await axios({
+        method: "get",
+        url: `${apiUrl}?api-key=${api}&show-fields=body`,
+      }).then(
+        (res) => (this.postContent = res.data.response.content.fields),
+        (err) => (this.postContent = "Content Invalid")
+      );
+      return this.postContent;
+    },
+    async getPosts() {
+      await axios({
+        method: "get",
+        url: `https://content.guardianapis.com/search?api-key=${api}&page-size=6`,
+      }).then(
+        (res) => this.handleResponse(res.data.response),
+        (err) => console.log(err)
+      );
+    },
+  },
+  mounted() {
+    this.getPosts();
+  },
+};
 </script>
 
 <style>
@@ -39,13 +91,14 @@ export default {
   float: left;
   padding: 15px;
 }
-.blogs-container{
+.blogs-container {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
-.info-container{
-   display: flex;
-  justify-content:start;
+.info-container {
+  display: flex;
+  justify-content: start;
   flex-direction: column;
 }
 /* For mobile phones: */

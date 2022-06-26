@@ -1,12 +1,10 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <img
-        src="https://c0.wallpaperflare.com/preview/483/210/436/car-green-4x4-jeep.jpg"
-      />
+      <img :src="blog - image" />
     </div>
     <div class="card-body">
-      <h4>Why is the Tesla Cybertruck designed the way it is?</h4>
+      <h4>{{ title }}</h4>
       <div class="user">
         <div class="user-info">
           <img
@@ -17,8 +15,7 @@
         <small>2h ago</small>
       </div>
       <p>
-        loreIpsum exercitation ea et culpa culpa sint occaecat voluptate irure
-        fugiat do consequat ullamco.
+        {{ content }}
       </p>
       <div class="read-more">
         <span><a href="#" class="link-text">This is a link</a></span>
@@ -43,7 +40,9 @@
 </template>
 
 <script>
-export default {};
+export default {
+  props: ["title", "content"],
+};
 </script>
 
 <style scoped>
